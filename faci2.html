@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FACI CHEKER</title>
+<style>
+  :root{
+    --teal:#0fae93;
+    --teal-dark:#0b8c75;
+    --mint:#eaf7f4;
+    --mint-2:#dff3ee;
+    --ink:#1d2b2a;
+    --muted:#7c8a89;
+    --border:#dbe9e6;
+    --red:#e3504f;
+    --orange:#e8932e;
+    --blue:#3b7fd9;
+    --white:#ffffff;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:"Segoe UI",system-ui,-apple-system,Arial,sans-serif;background:var(--mint);color:var(--ink);}
+  button{font-family:inherit;}
+  #loginScreen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(160deg,#0fae93 0%,#0b8c75 45%,#063f35 100%);padding:24px;}
+  .login-card{background:var(--white);border-radius:20px;padding:40px 36px;width:100%;max-width:380px;box-shadow:0 30px 60px rgba(0,0,0,0.25);}
+  .login-logo{display:flex;align-items:center;gap:10px;margin-bottom:28px;}
+  .login-logo .mark{width:42px;height:42px;border-radius:12px;background:var(--teal);display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:18px;}
+  .login-logo .word{font-weight:800;font-size:20px;letter-spacing:0.5px;color:var(--ink);}
+  .login-logo .word span{display:block;font-size:10px;font-weight:700;color:var(--teal);background:var(--mint-2);padding:1px 6px;border-radius:6px;width:max-content;letter-spacing:1px;}
+  .login-card h1{font-size:20px;margin:0 0 4px;}
+  .login-card p.sub{margin:0 0 26px;color:var(--muted);font-size:13.5px;}
+  .field{margin-bottom:16px;}
+  .field label{display:block;font-size:12.5px;font-weight:600;color:var(--ink);margin-bottom:6px;}
+  .field input{width:100%;padding:12px 14px;border-radius:10px;border:1.5px solid var(--border);font-size:14px;outline:none;background:var(--mint);transition:border-color .15s;}
+  .field input:focus{border-color:var(--teal);background:white;}
+  #loginError{color:var(--red);font-size:13px;margin:-4px 0 14px;min-height:16px;font-weight:600;}
+  .btn-primary{width:100%;padding:13px;border:none;border-radius:10px;background:var(--teal);color:white;font-weight:700;font-size:14.5px;cursor:pointer;transition:background .15s;}
+  .btn-primary:hover{background:var(--teal-dark);}
+  .login-foot{margin-top:18px;text-align:center;color:var(--muted);font-size:12px;}
+  #app{display:none;min-height:100vh;}
+  .shell{display:flex;min-height:100vh;}
+  .sidebar{width:248px;flex-shrink:0;background:white;border-right:1px solid var(--border);display:flex;flex-direction:column;padding:18px 14px;}
+  .brand{display:flex;align-items:center;gap:10px;padding:6px 8px 18px;}
+  .brand .mark{width:36px;height:36px;border-radius:10px;background:var(--teal);display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:15px;}
+  .brand .word{font-weight:800;font-size:17px;color:var(--ink);}
+  .brand .word span{display:block;font-size:9.5px;font-weight:700;color:var(--teal);background:var(--mint-2);padding:1px 6px;border-radius:5px;width:max-content;letter-spacing:1px;}
+  .nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;color:#445;font-size:14px;font-weight:600;cursor:pointer;margin-bottom:2px;user-select:none;}
+  .nav-item:hover{background:var(--mint);}
+  .nav-item.active{background:var(--mint-2);color:var(--teal-dark);}
+  .nav-item .ic{width:18px;text-align:center;font-size:15px;}
+  .nav-group-title{font-size:14px;font-weight:700;color:var(--ink);display:flex;align-items:center;gap:10px;padding:9px 10px;cursor:pointer;}
+  .nav-sub{margin-left:14px;border-left:2px solid var(--mint-2);padding-left:8px;}
+  .sidebar-bottom{margin-top:auto;display:flex;align-items:center;gap:10px;padding:10px 8px;border-top:1px solid var(--border);}
+  .avatar{width:34px;height:34px;border-radius:50%;background:var(--teal);color:white;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;}
+  .sb-name{font-size:13px;font-weight:700;line-height:1.2;}
+  .sb-sub{font-size:11px;color:var(--muted);}
+  .logout-btn{margin-left:auto;background:none;border:none;cursor:pointer;color:var(--muted);font-size:15px;}
+  .main{flex:1;padding:26px 34px;overflow-x:hidden;}
+  .topline{display:flex;align-items:center;gap:14px;margin-bottom:22px;}
+  .back-arrow{cursor:pointer;font-size:18px;color:var(--ink);}
+  .page-title{font-size:22px;font-weight:800;margin:0;}
+  .page-sub{color:var(--muted);font-size:13px;margin-top:2px;}
+  .card{background:white;border:1px solid var(--border);border-radius:14px;padding:20px;}
+  .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:22px;}
+  .stat-card{background:white;border:1px solid var(--border);border-radius:14px;padding:18px;text-align:center;}
+  .stat-card .num{font-size:26px;font-weight:800;color:var(--ink);}
+  .stat-card .lbl{color:var(--muted);font-size:12.5px;margin-top:2px;}
+  .quick-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .qa{display:flex;align-items:center;gap:12px;background:white;border:1px solid var(--border);border-radius:12px;padding:14px 16px;cursor:pointer;transition:box-shadow .15s,border-color .15s;}
+  .qa:hover{border-color:var(--teal);box-shadow:0 4px 14px rgba(15,174,147,0.12);}
+  .qa .ic{font-size:20px;}
+  .qa .lbl{font-weight:700;font-size:14px;}
+  .section-label{font-size:11.5px;font-weight:700;color:var(--muted);letter-spacing:0.5px;margin:18px 0 8px;}
+  .btn{border:none;border-radius:10px;padding:10px 16px;font-weight:700;font-size:13.5px;cursor:pointer;}
+  .btn-teal{background:var(--teal);color:white;}
+  .btn-teal:hover{background:var(--teal-dark);}
+  .btn-outline{background:white;border:1.5px solid var(--border);color:var(--ink);}
+  .btn-outline:hover{border-color:var(--teal);color:var(--teal-dark);}
+  .pill{border-radius:8px;border:1.5px solid var(--border);background:white;color:var(--ink);padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;}
+  .pill.active-pill{background:var(--mint-2);border-color:var(--teal);color:var(--teal-dark);}
+  .toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:10px;}
+  .empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:90px 0;color:var(--muted);}
+  .empty-state .emoji{font-size:54px;margin-bottom:14px;}
+  .empty-state .t1{font-weight:700;color:var(--ink);font-size:15px;}
+  .empty-state .t2{font-size:13px;margin-top:4px;}
+  .list-row{display:flex;align-items:center;justify-content:space-between;background:white;border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:10px;}
+  .list-row .left{display:flex;align-items:center;gap:12px;}
+  .icon-box{width:38px;height:38px;border-radius:10px;background:var(--mint-2);display:flex;align-items:center;justify-content:center;color:var(--teal-dark);font-size:17px;}
+  .list-title{font-weight:700;font-size:14.5px;}
+  .list-sub{font-size:12px;color:var(--muted);}
+  .row-actions{display:flex;gap:10px;color:var(--muted);}
+  .row-actions span{cursor:pointer;}
+  .row-actions span:hover{color:var(--teal-dark);}
+  .form-group{margin-bottom:18px;}
+  .form-group > label{display:block;font-size:13px;font-weight:700;margin-bottom:8px;}
+  .form-group input, .form-group select, .form-group textarea{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;background:var(--mint);outline:none;}
+  .form-group input:focus, .form-group textarea:focus{border-color:var(--teal);background:white;}
+  .opt-row{display:flex;gap:10px;flex-wrap:wrap;}
+  .opt-btn{border:1.5px solid var(--border);background:white;border-radius:10px;padding:9px 16px;font-weight:700;font-size:13.5px;cursor:pointer;color:var(--ink);}
+  .opt-btn.sel{background:var(--teal);border-color:var(--teal);color:white;}
+  .color-row{display:flex;gap:10px;flex-wrap:wrap;}
+  .swatch{width:30px;height:30px;border-radius:50%;cursor:pointer;border:3px solid transparent;display:flex;align-items:center;justify-content:center;color:white;font-size:13px;}
+  .swatch.sel{border-color:#33333355;}
+  .attendance-row{display:flex;align-items:center;justify-content:space-between;background:white;border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:10px;}
+  .att-btns{display:flex;gap:6px;}
+  .att-btn{width:34px;height:34px;border-radius:8px;border:1.5px solid var(--border);background:white;font-weight:800;font-size:13px;color:var(--muted);cursor:pointer;}
+  .att-btn.P.sel{background:#15b88b;border-color:#15b88b;color:white;}
+  .att-btn.A.sel{background:var(--red);border-color:var(--red);color:white;}
+  .att-btn.L.sel{background:var(--orange);border-color:var(--orange);color:white;}
+  .att-btn.E.sel{background:var(--blue);border-color:var(--blue);color:white;}
+  .att-summary{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
+  .chip{padding:6px 12px;border-radius:20px;font-size:12.5px;font-weight:700;}
+  .chip.present{background:#e3f8f0;color:#0f9d6f;}
+  .chip.absent{background:#fdeceb;color:#d23f3f;}
+  .chip.unmarked{background:#f1f1f1;color:#888;}
+  .date-nav{display:flex;align-items:center;justify-content:center;gap:18px;margin-bottom:18px;}
+  .date-nav .arrow{cursor:pointer;font-size:18px;color:var(--ink);user-select:none;}
+  .date-nav .date-txt{font-weight:700;}
+  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.35);display:none;align-items:center;justify-content:center;z-index:50;}
+  .modal-box{background:white;border-radius:16px;padding:26px 26px 22px;max-width:380px;width:90%;text-align:left;box-shadow:0 30px 60px rgba(0,0,0,0.3);}
+  .modal-box h3{margin:0 0 10px;font-size:16px;}
+  .modal-box p{font-size:13.5px;color:#445;margin:0 0 18px;line-height:1.5;}
+  .modal-box .btn-primary{width:100%;}
+  .week-grid{display:grid;grid-template-columns:60px repeat(5,1fr);border:1px solid var(--border);border-radius:12px;overflow:hidden;background:white;}
+  .week-head{padding:10px;text-align:center;font-weight:700;font-size:13px;border-bottom:1px solid var(--border);background:var(--mint);}
+  .week-head.today{color:var(--teal-dark);}
+  .hour-label{font-size:11px;color:var(--muted);padding:4px 6px;text-align:right;border-top:1px solid var(--border);}
+  .day-col{position:relative;border-top:1px solid var(--border);border-left:1px solid var(--border);min-height:46px;}
+  .class-block{position:absolute;left:4px;right:4px;border-radius:8px;color:white;font-size:11.5px;font-weight:700;padding:5px 7px;overflow:hidden;}
+  .next-class-banner{background:var(--mint-2);border:1px solid var(--teal);border-radius:14px;padding:16px 18px;margin-bottom:18px;display:flex;align-items:center;gap:14px;}
+  .next-class-banner .ic{font-size:22px;}
+  .next-class-banner .t1{font-size:11px;font-weight:700;color:var(--teal-dark);letter-spacing:.5px;}
+  .next-class-banner .t2{font-size:15px;font-weight:800;}
+  .next-class-banner .t3{font-size:12.5px;color:var(--muted);margin-top:2px;}
+  .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;flex-wrap:wrap;gap:12px;}
+  .greet h2{margin:0;font-size:21px;font-weight:800;}
+  .greet p{margin:2px 0 0;color:var(--muted);font-size:13px;}
+  .save-badge{display:inline-flex;align-items:center;gap:6px;background:var(--mint-2);color:var(--teal-dark);border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700;}
+  @media(max-width:780px){.sidebar{display:none;}.grid4{grid-template-columns:1fr 1fr;}.quick-grid{grid-template-columns:1fr;}.week-grid{grid-template-columns:44px repeat(5,1fr);font-size:11px;}.main{padding:18px;}}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="mark">FC</div>
+      <div class="word">FACI CHEKER<span>WEB</span></div>
+    </div>
+    <h1>Welcome back</h1>
+    <p class="sub">Sign in to continue to your dashboard.</p>
+    <div id="loginForm">
+      <div class="field">
+        <label>Account</label>
+        <input id="loginUser" type="text" autocomplete="username" placeholder="e.g. UP-FB2S26-IT2-05" onkeydown="if(event.key==='Enter') handleLogin(event)" />
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input id="loginPass" type="password" autocomplete="current-password" placeholder="Enter your password" onkeydown="if(event.key==='Enter') handleLogin(event)" />
+      </div>
+      <div id="loginError"></div>
+      <button type="button" class="btn-primary" onclick="handleLogin(event)">Log in</button>
+    </div>
+    <div class="login-foot">FACI CHEKER &copy; 2026</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <div class="shell">
+    <div class="sidebar">
+      <div class="brand">
+        <div class="mark">FC</div>
+        <div class="word">FACI CHEKER<span>WEB</span></div>
+      </div>
+      <div class="nav-item" data-page="dashboard" onclick="goTo('dashboard')"><span class="ic">🏠</span> Dashboard</div>
+      <div class="nav-group-title"><span class="ic">👥</span> Class Management</div>
+      <div class="nav-sub">
+        <div class="nav-item" data-page="sections" onclick="goTo('sections')"><span class="ic">📋</span> Sections</div>
+        <div class="nav-item" data-page="students" onclick="goTo('students')"><span class="ic">🎓</span> Students</div>
+        <div class="nav-item" data-page="attendance" onclick="goTo('attendance')"><span class="ic">✅</span> Attendance</div>
+        <div class="nav-item" data-page="outputChecker" onclick="goTo('outputChecker')"><span class="ic">📝</span> Output Checker</div>
+        <div class="nav-item" data-page="lateOutput" onclick="goTo('lateOutput')"><span class="ic">⏱️</span> Late Output</div>
+        <div class="nav-item" data-page="schedule" onclick="goTo('schedule')"><span class="ic">🗓️</span> My Schedule</div>
+      </div>
+      <div class="sidebar-bottom">
+        <div class="avatar" id="userInitial">U</div>
+        <div>
+          <div class="sb-name" id="sbName">User</div>
+          <div class="sb-sub">FACI CHEKER</div>
+        </div>
+        <button class="logout-btn" title="Log out" onclick="handleLogout()">⏏</button>
+      </div>
+    </div>
+
+    <div class="main">
+
+      <!-- DASHBOARD -->
+      <div id="page-dashboard" class="page">
+        <div class="topbar">
+          <div class="greet">
+            <h2>Good day, <span id="greetName">User</span></h2>
+            <p>FACI CHEKER · SY 2026-2027 · Term 1</p>
+          </div>
+          <span class="save-badge">💾 Auto-saved</span>
+        </div>
+        <div class="grid4">
+          <div class="stat-card"><div class="num" id="statExams">0</div><div class="lbl">Exams</div></div>
+          <div class="stat-card"><div class="num" id="statSections">0</div><div class="lbl">Sections</div></div>
+          <div class="stat-card"><div class="num" id="statStudents">0</div><div class="lbl">Students</div></div>
+          <div class="stat-card"><div class="num" id="statScanned">0</div><div class="lbl">Scanned</div></div>
+        </div>
+        <div class="section-label">QUICK ACTIONS</div>
+        <div class="quick-grid">
+          <div class="qa" onclick="goTo('sections')"><span class="ic">📋</span><span class="lbl">Sections</span></div>
+          <div class="qa" onclick="goTo('students')"><span class="ic">🎓</span><span class="lbl">Students</span></div>
+          <div class="qa" onclick="goTo('attendance')"><span class="ic">✅</span><span class="lbl">Attendance</span></div>
+          <div class="qa" onclick="goTo('outputChecker')"><span class="ic">📝</span><span class="lbl">Output Checker</span></div>
+          <div class="qa" onclick="goTo('lateOutput')"><span class="ic">⏱️</span><span class="lbl">Late Output</span></div>
+          <div class="qa" onclick="goTo('schedule')"><span class="ic">🗓️</span><span class="lbl">My Schedule</span></div>
+        </div>
+      </div>
+
+      <!-- SECTIONS LIST -->
+      <div id="page-sections" class="page" style="display:none;">
+        <div class="topline">
+          <span class="back-arrow" onclick="goTo('dashboard')">←</span>
+          <div><h1 class="page-title">Sections</h1></div>
+        </div>
+        <div class="toolbar">
+          <span id="sectionsCount" style="color:var(--muted);font-size:13px;"></span>
+          <button class="btn btn-teal" onclick="goTo('sectionForm')">+ Add</button>
+        </div>
+        <div id="sectionsList"></div>
+      </div>
+
+      <!-- ADD SECTION FORM -->
+      <div id="page-sectionForm" class="page" style="display:none;">
+        <div class="topline">
+          <span class="back-arrow" onclick="goTo('sections')">←</span>
+          <div><h1 class="page-title">New Section</h1></div>
+        </div>
+        <div class="card" style="max-width:520px;">
+          <div class="form-group">
+            <label>Section Name</label>
+            <input id="secName" placeholder="e.g. up-fb1s26-it2-05" />
+          </div>
+          <div class="form-group">
+            <label>Grade Level</label>
+            <div class="opt-row" id="gradeOpts"></div>
+          </div>
+          <div class="form-group">
+            <label>School Year</label>
+            <input id="secYear" value="2026-2027" disabled />
+          </div>
+          <div style="display:flex;gap:12px;">
+            <button class="btn btn-outline" style="flex:1;" onclick="goTo('sections')">Cancel</button>
+            <button class="btn btn-teal" style="flex:1;" onclick="saveSection()">Save</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- STUDENTS LIST -->
+      <div id="page-students" class="page" style="display:none;">
+        <div class="topline">
+          <span class="back-arrow" onclick="goTo('dashboard')">←</span>
+          <div><h1 class="page-title">Students</h1></div>
+        </div>
+        <div class="toolbar">
+          <input id="studentSearch" placeholder="Search name or LRN..." style="flex:1;max-width:400px;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;" oninput="renderStudents()" />
+          <button class="btn btn-teal" onclick="goTo('studentForm')">+ Add</button>
+        </div>
+        <div class="opt-row" style="margin-bottom:14px;" id="studentSexFilter">
+          <button class="pill active-pill" data-sex="All" onclick="setSexFilter('All')">All</button>
+          <button class="pill" data-sex="Male" onclick="setSexFilter('Male')">♂ Male</button>
+          <button class="pill" data-sex="Female" onclick="setSexFilter('Female')">♀ Female</button>
+        </div>
+        <div id="studentsList"></div>
+      </div>
+
+      <!-- ADD STUDENT FORM -->
+      <div id="page-studentForm" class="page" style="display:none;">
+        <div class="topline">
+          <span class="back-arrow" onclick="goTo('students')">←</span>
+          <div><h1 class="page-title">Add Student</h1></div>
+        </div>
+        <div class="card" style="max-width:520px;">
+          <div class="form-group"><label>Last Name</label><input id="stuLast" placeholder="e.g. Dela Cruz" /></div>
+          <div class="form-group"><label>First Name</label><input id="stuFirst" placeholder="e.g. Juan" /></div>
+          <div class="form-group">
+            <label>Sex</label>
+            <div class="opt-row">
+              <button type="button" class="opt-btn" id="stuSexM" onclick="setStuSex('Male')">♂ Male</button>
+              <button type="button" class="opt-btn" id="stuSexF" onclick="setStuSex('Female')">♀ Female</button>
+            </div>
+          </div>
+          <div class="form-group"><label>LRN (optional)</label><input id="stuLRN" placeholder="Learner Reference Number" /></div>
+          <div class="form-group"><label>Section</label><div id="stuSectionPill" class="opt-row"></div></div>
+          <div style="display:flex;gap:12px;">
+            <button class="btn btn-outline" style="flex:1;" onclick="goTo('students')">Cancel</button>
+            <button class="btn btn-teal" style="flex:1;" onclick="saveStudent()">Save</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ATTENDANCE -->
+      <div id="page-attendance" class="page" style="display:none;">
+        <div class="topline">
+          <span class="back-arrow" onclick="goTo('dashboard')">←</span>
+          <div><h1 class="page-title">Attendance</h1></div>
+        </div>
+        <div class="opt-row" id="attSectionTabs" style="margin-bottom:16px;"></div>
+        <div class="date-nav">
+          <span class="arrow" onclick="shiftDate(-1)">‹</span>
+          <span class="date-txt" id="attDateTxt">—</span>
+          <span class="arrow" onclick="shiftDate(1)">›</span>
+        </div>
+        <div class="att-summary" id="attSummary"></div>
+        <div class="opt-row" style="margin-bottom:16px;">
+          <button class="pill" onclick="markAll('P')">All Present</button>
+          <button class="pill" onclick="markAll('A')">All Absent</button>
+          <button class="pill" onclick="markAll('L')">All Late</button>
+          <button class="pill" onclick="markAll('E')">All Excused</button>
+        </div>
+        <div id="attendanceList"></div>
+        <div style="margin-top:18px;">
+          <button class="btn btn-teal" style="width:100%;padding:14px;" onclick="saveAttendance()">Save Attendance</button>
+        </div>
+      </div>
+
+      <!-- OUTPUT CHECKER -->
+      <div id="page-outputChecker" class="page" style="display:none;">
+        <div class="topline">
+          <span class="back-arrow" onclick="goTo('dashboard')">←</span>
+          <div><h1 class="page-title">Output Checker</h1></div>
+        </div>
+        <div class="date-nav">
+          <span class="arrow" onclick="shiftOcDate(-1)">‹</span>
+          <span class="date-txt" id="ocDateTxt">—</span>
+          <span class="arrow" onclick="shiftOcDate(1)">›</span>
+        </div>
+        <div style="text-align:center;margin:-10px 0 18px;">
+          <span id="ocJumpToday" style="color:var(--teal-dark);font-size:12.5px;font-weight:700;cursor:pointer;" onclick="jumpOcToday()">Jump to today</span>
+        </div>
+        <div class="card" style="margin-bottom:16px;">
+          <label style="display:block;font-size:13px;font-weight:700;margin-bottom:8px;">Output / Activity for this day</label>
+          <textarea id="ocTitle" rows="2" placeholder="e.g. Performance Task 3 – Research Output" style="width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;background:var(--mint);outline:none;font-family:inherit;"></textarea>
+          <button class="btn btn-teal" style="margin-top:10px;" onclick="saveOutputTitle()">Save</button>
+        </div>
+        <div class="card" style="margin-bottom:18px;">
+          <label style="display:block;font-size:13px;font-weight:700;margin-bottom:8px;">Deadline time (on this day)</label>
+          <input type="time" id="ocDeadlineTime" style="width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;background:var(--mint);outline:none;" />
+          <button class="btn btn-teal" style="margin-top:10px;" onclick="saveDeadline()">Save Deadline</button>
+          <div id="ocCountdown" style="margin-top:14px;font-weight:800;font-size:19px;color:var(--teal-dark);"></div>
+        </div>
+        <div class="opt-row" id="ocSectionTabs" style="margin-bottom:16px;"></div>
+        <div class="att-summary" id="ocSummary"></div>
+        <div class="opt-row" style="margin-bottom:16px;">
+          <button class="pill" onclick="markAllOutput('P')">All On Time</button>
+          <button class="pill" onclick="markAllOutput('A')">All Absent</button>
+          <button class="pill" onclick="markAllOutput('L')">All Late</button>
+          <button class="pill" onclick="markAllOutput('E')">All Excused</button>
+        </div>
+        <div id="ocList"></div>
+        <div style="margin-top:18px;">
+          <button class="btn btn-teal" style="width:100%;padding:14px;" onclick="saveOutput()">Save Output</button>
+        </div>
+      </div>
+
+      <!-- LATE OUTPUT -->
+      <div id="page-lateOutput" class="page" style="display:none;">
+        <div class="topline">
+          <span class="back-arrow" onclick="goTo('dashboard')">←</span>
+          <div><h1 class="page-title">Late Output</h1></div>
+        </div>
+        <div class="toolbar">
+          <button class="btn btn-outline" id="lateDeleteBtn" onclick="deleteSelectedLateOutput()" disabled>🗑️ Delete</button>
+          <button class="btn btn-teal" onclick="goTo('lateOutputForm')">+ Add</button>
+        </div>
+        <div id="lateOutputList"></div>
+      </div>
+
+      <!-- ADD LATE OUTPUT FORM -->
+      <div id="page-lateOutputForm" class="page" style="display:none;">
+        <div class="topline">
+          <span class="back-arrow" onclick="goTo('lateOutput')">←</span>
+          <div><h1 class="page-title">Log Late Output</h1></div>
+        </div>
+        <div class="card" style="max-width:560px;">
+          <div class="form-group"><label>Student Name</label><input id="loName" placeholder="e.g. Dela Cruz, Juan" /></div>
+          <div class="form-group"><label>Student's Section</label><select id="loSection"></select></div>
+          <div class="form-group"><label>Date of the deadline</label><input id="loDeadlineDate" type="date" /></div>
+          <div class="form-group"><label>Date (student passed the output late)</label><input id="loLateDate" type="date" /></div>
+          <div class="form-group"><label>Notes</label><textarea id="loNotes" rows="3" placeholder="e.g. Submitted via email, missing cover page"></textarea></div>
+          <button class="btn btn-teal" style="width:100%;padding:14px;" onclick="logLateOutput()">Log</button>
+        </div>
+      </div>
+
+      <!-- MY SCHEDULE -->
+      <div id="page-schedule" class="page" style="display:none;">
+        <div class="topline" style="justify-content:space-between;width:100%;">
+          <div style="display:flex;align-items:center;gap:14px;">
+            <span class="back-arrow" onclick="goTo('dashboard')">←</span>
+            <div><h1 class="page-title">My Schedule</h1></div>
+          </div>
+          <button class="btn btn-teal" style="margin-left:auto;" onclick="goTo('scheduleForm')">+</button>
+        </div>
+        <div id="nextClassBanner"></div>
+        <div class="week-grid" id="weekGrid"></div>
+      </div>
+
+      <!-- ADD CLASS FORM -->
+      <div id="page-scheduleForm" class="page" style="display:none;">
+        <div class="topline">
+          <span class="back-arrow" onclick="goTo('schedule')">←</span>
+          <div><h1 class="page-title">Add class</h1></div>
+        </div>
+        <div class="card" style="max-width:560px;">
+          <div class="form-group"><label>Class / subject</label><input id="clsName" placeholder="e.g. Science 7 – Mabini" /></div>
+          <div class="form-group">
+            <label>Days</label>
+            <div class="opt-row" id="clsDays">
+              <button type="button" class="opt-btn" data-day="Mon" onclick="toggleDay('Mon')">Mon</button>
+              <button type="button" class="opt-btn" data-day="Tue" onclick="toggleDay('Tue')">Tue</button>
+              <button type="button" class="opt-btn" data-day="Wed" onclick="toggleDay('Wed')">Wed</button>
+              <button type="button" class="opt-btn" data-day="Thu" onclick="toggleDay('Thu')">Thu</button>
+              <button type="button" class="opt-btn" data-day="Fri" onclick="toggleDay('Fri')">Fri</button>
+            </div>
+          </div>
+          <div class="form-group"><label>Starts</label><input id="clsStart" type="time" value="08:00" /></div>
+          <div class="form-group"><label>Ends</label><input id="clsEnd" type="time" value="09:00" /></div>
+          <div class="form-group"><label>Room / location (optional)</label><input id="clsRoom" placeholder="e.g. Room 204" /></div>
+          <div class="form-group"><label>Colour</label><div class="color-row" id="clsColors"></div></div>
+          <div class="form-group"><label>Notes</label><textarea id="clsNotes" rows="3" placeholder="e.g. Prepare microscope · Quiz on Ch. 3 · Group activity"></textarea></div>
+          <button class="btn btn-teal" style="width:100%;padding:14px;" onclick="saveClass()">✓ Add to schedule</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-box">
+    <h3 id="modalTitle">faci-cheker.app says</h3>
+    <p id="modalBody"></p>
+    <button class="btn-primary" onclick="closeModal()">OK</button>
+  </div>
+</div>
+
+<script>
+/* ======================================================
+   PERSISTENCE — localStorage helpers
+   Key prefix: "fc_"  so we don't clash with other sites
+====================================================== */
+const LS_KEY = 'fc_state';
+
+function persistState(){
+  try {
+    localStorage.setItem(LS_KEY, JSON.stringify({
+      sections:    state.sections,
+      students:    state.students,
+      attendance:  state.attendance,
+      classes:     state.classes,
+      outputs:     state.outputs,
+      lateOutputs: state.lateOutputs
+    }));
+  } catch(e){ console.warn('localStorage save failed', e); }
+}
+
+function loadState(){
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    if(!raw) return;
+    const saved = JSON.parse(raw);
+    if(saved.sections)    state.sections    = saved.sections;
+    if(saved.students)    state.students    = saved.students;
+    if(saved.attendance)  state.attendance  = saved.attendance;
+    if(saved.classes)     state.classes     = saved.classes;
+    if(saved.outputs)     state.outputs     = saved.outputs;
+    if(saved.lateOutputs) state.lateOutputs = saved.lateOutputs;
+  } catch(e){ console.warn('localStorage load failed', e); }
+}
+
+/* ============ AUTH ============ */
+const VALID_USER = "UP-FB2S26-IT2-05";
+const VALID_PASS = "Jm162007";
+
+function handleLogin(e){
+  e.preventDefault();
+  const u = document.getElementById('loginUser').value.trim();
+  const p = document.getElementById('loginPass').value;
+  const errEl = document.getElementById('loginError');
+  if(u.toUpperCase() === VALID_USER.toUpperCase() && p === VALID_PASS){
+    errEl.textContent = '';
+    loadState(); // ← load saved data on login
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    document.getElementById('sbName').textContent = u.toUpperCase();
+    document.getElementById('greetName').textContent = u.toUpperCase();
+    document.getElementById('userInitial').textContent = u.charAt(0).toUpperCase();
+    goTo('dashboard');
+  } else {
+    errEl.textContent = 'Incorrect account or password. Please try again.';
+  }
+  return false;
+}
+function handleLogout(){
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('loginUser').value = '';
+  document.getElementById('loginPass').value = '';
+  document.getElementById('loginError').textContent = '';
+}
+
+/* ============ STATE ============ */
+let state = {
+  sections:    [],
+  students:    [],
+  attendance:  {},
+  classes:     [],
+  outputs:     {},
+  lateOutputs: []
+};
+let countdownTimer = null;
+let ui = {
+  newSecGrade: 'G12',
+  newStuSex: null,
+  newStuSection: null,
+  studentSexFilter: 'All',
+  attSectionId: null,
+  attDate: new Date(),
+  newClsDays: [],
+  newClsColor: '#0fae93',
+  ocSectionId: null,
+  ocDate: new Date(),
+  selectedLateOutputId: null
+};
+
+/* ============ NAV ============ */
+function goTo(page){
+  document.querySelectorAll('.page').forEach(p=>p.style.display='none');
+  const target = document.getElementById('page-'+page);
+  if(target) target.style.display='block';
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  const navMap = {sections:'sections',students:'students',attendance:'attendance',outputChecker:'outputChecker',lateOutput:'lateOutput',schedule:'schedule',dashboard:'dashboard'};
+  const navKey = navMap[page];
+  if(navKey){
+    const el = document.querySelector('.nav-item[data-page="'+navKey+'"]');
+    if(el) el.classList.add('active');
+  }
+  if(page!=='outputChecker' && countdownTimer){ clearInterval(countdownTimer); countdownTimer=null; }
+  if(page==='sections')      renderSections();
+  if(page==='sectionForm')   renderSectionForm();
+  if(page==='students')      renderStudents();
+  if(page==='studentForm')   renderStudentForm();
+  if(page==='attendance')    renderAttendancePage();
+  if(page==='outputChecker') renderOutputChecker();
+  if(page==='lateOutput')    renderLateOutputList();
+  if(page==='lateOutputForm')renderLateOutputForm();
+  if(page==='schedule')      renderSchedule();
+  if(page==='scheduleForm')  renderScheduleForm();
+  if(page==='dashboard')     renderDashboard();
+  window.scrollTo(0,0);
+}
+
+/* ============ MODAL ============ */
+function showModal(title, body){
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalBody').innerHTML = body;
+  document.getElementById('modalOverlay').style.display='flex';
+}
+function closeModal(){ document.getElementById('modalOverlay').style.display='none'; }
+
+/* ============ DASHBOARD ============ */
+function renderDashboard(){
+  document.getElementById('statExams').textContent = 0;
+  document.getElementById('statSections').textContent = state.sections.length;
+  document.getElementById('statStudents').textContent = state.students.length;
+  document.getElementById('statScanned').textContent = 0;
+}
+
+/* ============ SECTIONS ============ */
+function renderSections(){
+  const list = document.getElementById('sectionsList');
+  const countEl = document.getElementById('sectionsCount');
+  countEl.textContent = state.sections.length + (state.sections.length===1?' section':' sections');
+  if(state.sections.length===0){
+    list.innerHTML = `<div class="card"><div class="empty-state"><div class="emoji">🦜</div><div class="t1">No sections yet</div><div class="t2">Add a section to get started</div></div></div>`;
+    return;
+  }
+  list.innerHTML = state.sections.map(s=>`
+    <div class="list-row">
+      <div class="left">
+        <div class="icon-box">👥</div>
+        <div>
+          <div class="list-title">${escapeHtml(s.name)}</div>
+          <div class="list-sub">${s.grade} · ${s.year}</div>
+        </div>
+      </div>
+      <div class="row-actions">
+        <span title="Delete" onclick="deleteSection('${s.id}')">🗑️</span>
+      </div>
+    </div>`).join('');
+}
+function renderSectionForm(){
+  document.getElementById('secName').value = '';
+  ui.newSecGrade = 'G12';
+  const opts = document.getElementById('gradeOpts');
+  const grades = ['G11','G12','FIRST YEAR','SECOND YEAR','THIRD YEAR','FOURTH YEAR','UPPERCLASSMEN'];
+  opts.innerHTML = grades.map(g=>`<button type="button" class="opt-btn ${g===ui.newSecGrade?'sel':''}" onclick="pickGrade('${g}')">${g}</button>`).join('');
+}
+function pickGrade(g){
+  ui.newSecGrade = g;
+  document.querySelectorAll('#gradeOpts .opt-btn').forEach(b=>b.classList.toggle('sel', b.textContent===g));
+}
+function saveSection(){
+  const name = document.getElementById('secName').value.trim();
+  if(!name){ showModal('faci-cheker.app says','Please enter a section name.'); return; }
+  state.sections.push({id:'sec_'+Date.now(), name, grade:ui.newSecGrade, year:'2026-2027'});
+  persistState(); // ← save
+  goTo('sections');
+}
+function deleteSection(id){
+  state.sections = state.sections.filter(s=>s.id!==id);
+  state.students = state.students.filter(st=>st.sectionId!==id);
+  persistState(); // ← save
+  renderSections();
+}
+
+/* ============ STUDENTS ============ */
+function setSexFilter(v){
+  ui.studentSexFilter = v;
+  document.querySelectorAll('#studentSexFilter .pill').forEach(p=>p.classList.toggle('active-pill', p.dataset.sex===v));
+  renderStudents();
+}
+function renderStudents(){
+  const list = document.getElementById('studentsList');
+  const q = (document.getElementById('studentSearch')?.value||'').toLowerCase();
+  let items = state.students.filter(s=>{
+    const matchesSex = ui.studentSexFilter==='All' || s.sex===ui.studentSexFilter;
+    const full = (s.last+' '+s.first+' '+(s.lrn||'')).toLowerCase();
+    return matchesSex && full.includes(q);
+  });
+  if(items.length===0){
+    list.innerHTML = `<div class="card"><div class="empty-state"><div class="emoji">🦜</div><div class="t1">No students found</div><div class="t2">Add a student to get started</div></div></div>`;
+    return;
+  }
+  list.innerHTML = items.map(s=>{
+    const sec = state.sections.find(sec=>sec.id===s.sectionId);
+    return `<div class="list-row">
+      <div class="left">
+        <div class="icon-box">${s.sex==='Female'?'♀':'♂'}</div>
+        <div>
+          <div class="list-title">${escapeHtml(s.last)}, ${escapeHtml(s.first)}</div>
+          <div class="list-sub">${sec?escapeHtml(sec.name):'No section'}${s.lrn?(' · LRN '+escapeHtml(s.lrn)):''}</div>
+        </div>
+      </div>
+      <div class="row-actions">
+        <span title="Delete" onclick="deleteStudent('${s.id}')">🗑️</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+function renderStudentForm(){
+  document.getElementById('stuLast').value='';
+  document.getElementById('stuFirst').value='';
+  document.getElementById('stuLRN').value='';
+  ui.newStuSex = null;
+  document.getElementById('stuSexM').classList.remove('sel');
+  document.getElementById('stuSexF').classList.remove('sel');
+  ui.newStuSection = state.sections.length? state.sections[0].id : null;
+  const pillBox = document.getElementById('stuSectionPill');
+  if(state.sections.length===0){
+    pillBox.innerHTML = `<span style="color:var(--muted);font-size:13px;">No sections yet — add one first.</span>`;
+  } else {
+    pillBox.innerHTML = state.sections.map(s=>`<button type="button" class="opt-btn ${s.id===ui.newStuSection?'sel':''}" onclick="pickStuSection('${s.id}')">${escapeHtml(s.name)}</button>`).join('');
+  }
+}
+function setStuSex(sex){
+  ui.newStuSex = sex;
+  document.getElementById('stuSexM').classList.toggle('sel', sex==='Male');
+  document.getElementById('stuSexF').classList.toggle('sel', sex==='Female');
+}
+function pickStuSection(id){
+  ui.newStuSection = id;
+  document.querySelectorAll('#stuSectionPill .opt-btn').forEach(b=>{
+    const sec = state.sections.find(s=>s.id===id);
+    b.classList.toggle('sel', sec && b.textContent===sec.name);
+  });
+}
+function saveStudent(){
+  const last = document.getElementById('stuLast').value.trim();
+  const first = document.getElementById('stuFirst').value.trim();
+  const lrn = document.getElementById('stuLRN').value.trim();
+  if(!last||!first){ showModal('faci-cheker.app says','Please enter both last and first name.'); return; }
+  if(!ui.newStuSex){ showModal('faci-cheker.app says',"Please select the student's sex."); return; }
+  if(!ui.newStuSection){ showModal('faci-cheker.app says','Please add a section first, then assign the student to it.'); return; }
+  state.students.push({id:'stu_'+Date.now(), last, first, sex:ui.newStuSex, lrn, sectionId:ui.newStuSection});
+  persistState(); // ← save
+  showModal('faci-cheker.app says', `Learner saved ✓<br><br>${escapeHtml(first)} ${escapeHtml(last)}<br><br>Ready for the next learner.`);
+  document.getElementById('stuLast').value='';
+  document.getElementById('stuFirst').value='';
+  document.getElementById('stuLRN').value='';
+}
+function deleteStudent(id){
+  state.students = state.students.filter(s=>s.id!==id);
+  persistState(); // ← save
+  renderStudents();
+}
+
+/* ============ ATTENDANCE ============ */
+function fmtDate(d){
+  return d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'2-digit',year:'numeric'}).replace(',',',');
+}
+function dateKey(d){
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function renderAttendancePage(){
+  const tabs = document.getElementById('attSectionTabs');
+  if(state.sections.length===0){
+    tabs.innerHTML='';
+    document.getElementById('attendanceList').innerHTML=`<div class="card"><div class="empty-state"><div class="emoji">🦜</div><div class="t1">No sections yet</div><div class="t2">Add a section first to take attendance</div></div></div>`;
+    document.getElementById('attDateTxt').textContent=fmtDate(ui.attDate);
+    document.getElementById('attSummary').innerHTML='';
+    return;
+  }
+  if(!ui.attSectionId||!state.sections.find(s=>s.id===ui.attSectionId)) ui.attSectionId=state.sections[0].id;
+  tabs.innerHTML=state.sections.map(s=>`<button class="pill ${s.id===ui.attSectionId?'active-pill':''}" onclick="pickAttSection('${s.id}')">${escapeHtml(s.name)}</button>`).join('');
+  document.getElementById('attDateTxt').textContent=fmtDate(ui.attDate);
+  renderAttendanceList();
+}
+function pickAttSection(id){ ui.attSectionId=id; renderAttendancePage(); }
+function shiftDate(delta){ ui.attDate.setDate(ui.attDate.getDate()+delta); renderAttendancePage(); }
+function currentAttRecord(){
+  const key=ui.attSectionId+'|'+dateKey(ui.attDate);
+  if(!state.attendance[key]) state.attendance[key]={};
+  return state.attendance[key];
+}
+function renderAttendanceList(){
+  const list=document.getElementById('attendanceList');
+  const studs=state.students.filter(s=>s.sectionId===ui.attSectionId);
+  const rec=currentAttRecord();
+  if(studs.length===0){
+    list.innerHTML=`<div class="card"><div class="empty-state"><div class="emoji">🦜</div><div class="t1">No students in this section</div></div></div>`;
+    document.getElementById('attSummary').innerHTML='';
+    return;
+  }
+  let present=0,absent=0,late=0,excused=0,unmarked=0;
+  studs.forEach(s=>{const v=rec[s.id];if(v==='P')present++;else if(v==='A')absent++;else if(v==='L')late++;else if(v==='E')excused++;else unmarked++;});
+  let summaryHtml=`<span class="chip present">${present} Present</span><span class="chip absent">${absent} Absent</span>`;
+  if(late>0) summaryHtml+=`<span class="chip" style="background:#fdf3e3;color:#b9750f;">${late} Late</span>`;
+  if(excused>0) summaryHtml+=`<span class="chip" style="background:#e8f0fd;color:#3b62d2;">${excused} Excused</span>`;
+  if(unmarked>0) summaryHtml+=`<span class="chip unmarked">${unmarked} unmarked</span>`;
+  document.getElementById('attSummary').innerHTML=summaryHtml;
+  const girls=studs.filter(s=>s.sex==='Female').sort((a,b)=>a.last.localeCompare(b.last));
+  const boys=studs.filter(s=>s.sex==='Male').sort((a,b)=>a.last.localeCompare(b.last));
+  function rowHtml(s,idx){
+    const v=rec[s.id];
+    return `<div class="attendance-row">
+      <div><strong>${idx}.</strong> ${escapeHtml(s.last)}, ${escapeHtml(s.first)}</div>
+      <div class="att-btns">
+        <button class="att-btn P ${v==='P'?'sel':''}" onclick="markStudent('${s.id}','P')">P</button>
+        <button class="att-btn A ${v==='A'?'sel':''}" onclick="markStudent('${s.id}','A')">A</button>
+        <button class="att-btn L ${v==='L'?'sel':''}" onclick="markStudent('${s.id}','L')">L</button>
+        <button class="att-btn E ${v==='E'?'sel':''}" onclick="markStudent('${s.id}','E')">E</button>
+      </div>
+    </div>`;
+  }
+  let html='';
+  if(girls.length){ html+=`<div style="font-weight:700;font-size:12px;color:var(--muted);margin:10px 0;">♀ GIRLS</div>`; html+=girls.map((s,i)=>rowHtml(s,i+1)).join(''); }
+  if(boys.length){  html+=`<div style="font-weight:700;font-size:12px;color:var(--muted);margin:10px 0;">♂ BOYS</div>`; html+=boys.map((s,i)=>rowHtml(s,i+1)).join(''); }
+  list.innerHTML=html;
+}
+function markStudent(studentId,val){
+  const rec=currentAttRecord();
+  rec[studentId]=val;
+  persistState(); // ← auto-save on each mark
+  renderAttendanceList();
+}
+function markAll(val){
+  const studs=state.students.filter(s=>s.sectionId===ui.attSectionId);
+  const rec=currentAttRecord();
+  studs.forEach(s=>rec[s.id]=val);
+  persistState(); // ← save
+  renderAttendanceList();
+}
+function saveAttendance(){
+  persistState(); // ← explicit save
+  showModal('faci-cheker.app says',`Saved ✓<br><br>Attendance for ${fmtDate(ui.attDate)} saved and will persist across reloads.`);
+}
+
+/* ============ OUTPUT CHECKER ============ */
+function currentOutputRecord(){
+  const key=dateKey(ui.ocDate);
+  if(!state.outputs[key]) state.outputs[key]={title:'',deadline:'',marks:{}};
+  return state.outputs[key];
+}
+function shiftOcDate(delta){ ui.ocDate.setDate(ui.ocDate.getDate()+delta); renderOutputChecker(); }
+function jumpOcToday(){ ui.ocDate=new Date(); renderOutputChecker(); }
+function renderOutputChecker(){
+  const rec=currentOutputRecord();
+  document.getElementById('ocDateTxt').textContent=fmtDate(ui.ocDate);
+  document.getElementById('ocTitle').value=rec.title||'';
+  document.getElementById('ocDeadlineTime').value=rec.deadline||'';
+  renderOcSectionTabs();
+  startCountdown();
+}
+function saveOutputTitle(){
+  const rec=currentOutputRecord();
+  rec.title=document.getElementById('ocTitle').value.trim();
+  persistState(); // ← save
+  showModal('faci-cheker.app says',`Output saved for ${fmtDate(ui.ocDate)}.`);
+}
+function saveDeadline(){
+  const rec=currentOutputRecord();
+  rec.deadline=document.getElementById('ocDeadlineTime').value;
+  persistState(); // ← save
+  showModal('faci-cheker.app says',`Deadline saved for ${fmtDate(ui.ocDate)}.`);
+  startCountdown();
+}
+function startCountdown(){
+  if(countdownTimer){ clearInterval(countdownTimer); countdownTimer=null; }
+  updateCountdown();
+  countdownTimer=setInterval(updateCountdown,1000);
+}
+function updateCountdown(){
+  const el=document.getElementById('ocCountdown');
+  if(!el){ if(countdownTimer){ clearInterval(countdownTimer); countdownTimer=null; } return; }
+  const rec=currentOutputRecord();
+  if(!rec.deadline){ el.textContent='No deadline set for this day yet.'; el.style.color='var(--muted)'; return; }
+  const [hh,mm]=rec.deadline.split(':').map(Number);
+  const target=new Date(ui.ocDate.getFullYear(),ui.ocDate.getMonth(),ui.ocDate.getDate(),hh,mm,0).getTime();
+  let diff=target-Date.now();
+  if(diff<=0){ el.textContent='⏰ Deadline has passed'; el.style.color='var(--red)'; if(countdownTimer){ clearInterval(countdownTimer); countdownTimer=null; } return; }
+  el.style.color='var(--teal-dark)';
+  const days=Math.floor(diff/86400000); diff-=days*86400000;
+  const hours=Math.floor(diff/3600000); diff-=hours*3600000;
+  const mins=Math.floor(diff/60000); diff-=mins*60000;
+  const secs=Math.floor(diff/1000);
+  el.textContent=`⏳ ${days}d ${hours}h ${mins}m ${secs}s remaining`;
+}
+function renderOcSectionTabs(){
+  const tabs=document.getElementById('ocSectionTabs');
+  if(state.sections.length===0){
+    tabs.innerHTML='';
+    document.getElementById('ocList').innerHTML=`<div class="card"><div class="empty-state"><div class="emoji">🦜</div><div class="t1">No sections yet</div><div class="t2">Add a section first to check outputs</div></div></div>`;
+    document.getElementById('ocSummary').innerHTML='';
+    return;
+  }
+  if(!ui.ocSectionId||!state.sections.find(s=>s.id===ui.ocSectionId)) ui.ocSectionId=state.sections[0].id;
+  tabs.innerHTML=state.sections.map(s=>`<button class="pill ${s.id===ui.ocSectionId?'active-pill':''}" onclick="pickOcSection('${s.id}')">${escapeHtml(s.name)}</button>`).join('');
+  renderOcList();
+}
+function pickOcSection(id){ ui.ocSectionId=id; renderOcSectionTabs(); }
+function renderOcList(){
+  const list=document.getElementById('ocList');
+  const studs=state.students.filter(s=>s.sectionId===ui.ocSectionId);
+  const rec=currentOutputRecord();
+  if(studs.length===0){
+    list.innerHTML=`<div class="card"><div class="empty-state"><div class="emoji">🦜</div><div class="t1">No students in this section</div></div></div>`;
+    document.getElementById('ocSummary').innerHTML='';
+    return;
+  }
+  let onTime=0,absent=0,late=0,excused=0,unmarked=0;
+  studs.forEach(s=>{const v=rec.marks[s.id];if(v==='P')onTime++;else if(v==='A')absent++;else if(v==='L')late++;else if(v==='E')excused++;else unmarked++;});
+  let summaryHtml=`<span class="chip present">${onTime} On Time</span><span class="chip absent">${absent} Absent</span>`;
+  if(late>0) summaryHtml+=`<span class="chip" style="background:#fdf3e3;color:#b9750f;">${late} Late</span>`;
+  if(excused>0) summaryHtml+=`<span class="chip" style="background:#e8f0fd;color:#3b62d2;">${excused} Excused</span>`;
+  if(unmarked>0) summaryHtml+=`<span class="chip unmarked">${unmarked} unmarked</span>`;
+  document.getElementById('ocSummary').innerHTML=summaryHtml;
+  const girls=studs.filter(s=>s.sex==='Female').sort((a,b)=>a.last.localeCompare(b.last));
+  const boys=studs.filter(s=>s.sex==='Male').sort((a,b)=>a.last.localeCompare(b.last));
+  function rowHtml(s,idx){
+    const v=rec.marks[s.id];
+    return `<div class="attendance-row">
+      <div><strong>${idx}.</strong> ${escapeHtml(s.last)}, ${escapeHtml(s.first)}</div>
+      <div class="att-btns">
+        <button class="att-btn P ${v==='P'?'sel':''}" title="Pass On Time" onclick="markOutputStudent('${s.id}','P')">P</button>
+        <button class="att-btn A ${v==='A'?'sel':''}" title="Absent" onclick="markOutputStudent('${s.id}','A')">A</button>
+        <button class="att-btn L ${v==='L'?'sel':''}" title="Pass Late" onclick="markOutputStudent('${s.id}','L')">L</button>
+        <button class="att-btn E ${v==='E'?'sel':''}" title="Excused" onclick="markOutputStudent('${s.id}','E')">E</button>
+      </div>
+    </div>`;
+  }
+  let html='';
+  if(girls.length){ html+=`<div style="font-weight:700;font-size:12px;color:var(--muted);margin:10px 0;">♀ GIRLS</div>`; html+=girls.map((s,i)=>rowHtml(s,i+1)).join(''); }
+  if(boys.length){  html+=`<div style="font-weight:700;font-size:12px;color:var(--muted);margin:10px 0;">♂ BOYS</div>`; html+=boys.map((s,i)=>rowHtml(s,i+1)).join(''); }
+  list.innerHTML=html;
+}
+function markOutputStudent(id,val){
+  const rec=currentOutputRecord();
+  rec.marks[id]=val;
+  persistState(); // ← auto-save
+  renderOcList();
+}
+function markAllOutput(val){
+  const studs=state.students.filter(s=>s.sectionId===ui.ocSectionId);
+  const rec=currentOutputRecord();
+  studs.forEach(s=>rec.marks[s.id]=val);
+  persistState(); // ← save
+  renderOcList();
+}
+function saveOutput(){
+  persistState(); // ← explicit save
+  showModal('faci-cheker.app says',`Saved ✓<br><br>Output checklist for ${fmtDate(ui.ocDate)} saved and will persist across reloads.`);
+}
+
+/* ---- LATE OUTPUT ---- */
+function renderLateOutputList(){
+  const list=document.getElementById('lateOutputList');
+  if(state.lateOutputs.length===0){
+    list.innerHTML=`<div class="card"><div class="empty-state"><div class="emoji">🦜</div><div class="t1">No late output logged yet</div><div class="t2">Tap + Add to log a student's late output</div></div></div>`;
+    ui.selectedLateOutputId=null;
+    updateDeleteButtonState();
+    return;
+  }
+  list.innerHTML=state.lateOutputs.map(item=>{
+    const sel=item.id===ui.selectedLateOutputId;
+    return `<div class="list-row" style="cursor:pointer;${sel?'border-color:var(--teal);background:var(--mint-2);':''}" onclick="selectLateOutput('${item.id}')">
+      <div class="left">
+        <div class="icon-box">⏱️</div>
+        <div>
+          <div class="list-title">${escapeHtml(item.name)}</div>
+          <div class="list-sub">${escapeHtml(item.section||'—')} · Deadline: ${item.deadlineDate?fmtPlainDate(item.deadlineDate):'—'} · Passed: ${item.lateDate?fmtPlainDate(item.lateDate):'—'}</div>
+          ${item.notes?`<div class="list-sub" style="margin-top:2px;">${escapeHtml(item.notes)}</div>`:''}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  updateDeleteButtonState();
+}
+function fmtPlainDate(isoStr){
+  const d=new Date(isoStr+'T00:00:00');
+  if(isNaN(d.getTime())) return isoStr;
+  return d.toLocaleDateString('en-US',{month:'short',day:'2-digit',year:'numeric'});
+}
+function selectLateOutput(id){
+  ui.selectedLateOutputId=(ui.selectedLateOutputId===id)?null:id;
+  renderLateOutputList();
+}
+function updateDeleteButtonState(){
+  document.getElementById('lateDeleteBtn').disabled=!ui.selectedLateOutputId;
+}
+function deleteSelectedLateOutput(){
+  if(!ui.selectedLateOutputId) return;
+  state.lateOutputs=state.lateOutputs.filter(x=>x.id!==ui.selectedLateOutputId);
+  ui.selectedLateOutputId=null;
+  persistState(); // ← save
+  renderLateOutputList();
+}
+function renderLateOutputForm(){
+  document.getElementById('loName').value='';
+  document.getElementById('loDeadlineDate').value='';
+  document.getElementById('loLateDate').value='';
+  document.getElementById('loNotes').value='';
+  const sel=document.getElementById('loSection');
+  if(state.sections.length===0){
+    sel.innerHTML=`<option value="">No sections yet</option>`;
+  } else {
+    sel.innerHTML=state.sections.map(s=>`<option value="${escapeHtml(s.name)}">${escapeHtml(s.name)}</option>`).join('');
+  }
+}
+function logLateOutput(){
+  const name=document.getElementById('loName').value.trim();
+  const section=document.getElementById('loSection').value;
+  const deadlineDate=document.getElementById('loDeadlineDate').value;
+  const lateDate=document.getElementById('loLateDate').value;
+  const notes=document.getElementById('loNotes').value.trim();
+  if(!name){ showModal('faci-cheker.app says',"Please enter the student's name."); return; }
+  if(!section){ showModal('faci-cheker.app says',"Please select the student's section."); return; }
+  state.lateOutputs.push({id:'lo_'+Date.now(), name, section, deadlineDate, lateDate, notes});
+  persistState(); // ← save
+  goTo('lateOutput');
+}
+
+/* ============ SCHEDULE ============ */
+const dayCols=['Mon','Tue','Wed','Thu','Fri'];
+function renderSchedule(){
+  const grid=document.getElementById('weekGrid');
+  let html='<div></div>';
+  const todayDay=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][new Date().getDay()];
+  dayCols.forEach(d=>html+=`<div class="week-head ${d===todayDay?'today':''}">${d}</div>`);
+  const hours=[];
+  for(let h=6;h<=18;h++) hours.push(h);
+  hours.forEach(h=>{
+    const label=(h%12===0?12:h%12)+(h<12?' AM':' PM');
+    html+=`<div class="hour-label">${label}</div>`;
+    dayCols.forEach(d=>html+=`<div class="day-col" data-hour="${h}" data-day="${d}"></div>`);
+  });
+  grid.innerHTML=html;
+  state.classes.forEach(c=>{
+    c.days.forEach(d=>{
+      const colEl=grid.querySelector(`.day-col[data-day="${d}"][data-hour="${parseInt(c.start.split(':')[0])}"]`);
+      if(colEl){
+        const startMin=toMinutes(c.start),endMin=toMinutes(c.end);
+        const dur=Math.max(endMin-startMin,20);
+        const block=document.createElement('div');
+        block.className='class-block';
+        block.style.background=c.color;
+        block.style.top=((toMinutes(c.start)%60)/60*46)+'px';
+        block.style.height=(dur/60*46)+'px';
+        block.innerHTML=`${escapeHtml(c.name)}<br><span style="font-weight:600;font-size:10.5px;">${formatTime(c.start)}</span>`;
+        colEl.style.position='relative';
+        colEl.appendChild(block);
+      }
+    });
+  });
+  const banner=document.getElementById('nextClassBanner');
+  if(state.classes.length===0){ banner.innerHTML=''; }
+  else {
+    const c=state.classes[0];
+    banner.innerHTML=`<div class="next-class-banner">
+      <div class="ic">🔔</div>
+      <div>
+        <div class="t1">NEXT CLASS</div>
+        <div class="t2">${escapeHtml(c.name)}</div>
+        <div class="t3">${c.days.join(', ')} · ${formatTime(c.start)}${c.room?' · '+escapeHtml(c.room):''}</div>
+      </div>
+    </div>`;
+  }
+}
+function toMinutes(t){ const [h,m]=t.split(':').map(Number); return h*60+m; }
+function formatTime(t){
+  const [h,m]=t.split(':').map(Number);
+  const hh=h%12===0?12:h%12;
+  return hh+':'+String(m).padStart(2,'0')+(h<12?' AM':' PM');
+}
+function renderScheduleForm(){
+  document.getElementById('clsName').value='';
+  document.getElementById('clsRoom').value='';
+  document.getElementById('clsNotes').value='';
+  document.getElementById('clsStart').value='08:00';
+  document.getElementById('clsEnd').value='09:00';
+  ui.newClsDays=[];
+  document.querySelectorAll('#clsDays .opt-btn').forEach(b=>b.classList.remove('sel'));
+  ui.newClsColor='#0fae93';
+  const colors=['#0fae93','#3b7fd9','#8e5fe0','#e8722f','#3fb24d','#e3504f','#e8932e','#e0b32e','#e35fa0','#7a5230','#39b6e0'];
+  document.getElementById('clsColors').innerHTML=colors.map(c=>`<div class="swatch ${c===ui.newClsColor?'sel':''}" style="background:${c};" onclick="pickClsColor('${c}', this)">${c===ui.newClsColor?'✓':''}</div>`).join('');
+}
+function toggleDay(d){
+  const idx=ui.newClsDays.indexOf(d);
+  if(idx>-1) ui.newClsDays.splice(idx,1); else ui.newClsDays.push(d);
+  document.querySelectorAll('#clsDays .opt-btn').forEach(b=>b.classList.toggle('sel',ui.newClsDays.includes(b.dataset.day)));
+}
+function pickClsColor(c,el){
+  ui.newClsColor=c;
+  document.querySelectorAll('#clsColors .swatch').forEach(s=>{s.classList.remove('sel');s.textContent='';});
+  el.classList.add('sel');
+  el.textContent='✓';
+}
+function saveClass(){
+  const name=document.getElementById('clsName').value.trim();
+  const start=document.getElementById('clsStart').value;
+  const end=document.getElementById('clsEnd').value;
+  const room=document.getElementById('clsRoom').value.trim();
+  const notes=document.getElementById('clsNotes').value.trim();
+  if(!name){ showModal('faci-cheker.app says','Please enter a class / subject name.'); return; }
+  if(ui.newClsDays.length===0){ showModal('faci-cheker.app says','Please pick at least one day.'); return; }
+  state.classes.push({id:'cls_'+Date.now(), name, days:[...ui.newClsDays], start, end, room, color:ui.newClsColor, notes});
+  persistState(); // ← save
+  goTo('schedule');
+}
+
+/* ============ UTIL ============ */
+function escapeHtml(str){
+  if(!str) return '';
+  return str.replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+</script>
+</body>
+</html>
